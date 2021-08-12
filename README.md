@@ -13,7 +13,8 @@ Supports all the hashing algorihms supported by Java's [MessageDigest](https://d
 ## Exit Codes
 | Exit Code | Meaning |
 |-|-|
-| `0` | Application ran successfully and the given hash matches.
-| `1` | Application ran successfully but the given hash did not match.
-| `-1` | Application did not run successfully. No hash was compared.
+| `0` | Application ran successfully and the given hash matches.|
+| `1` | Application ran successfully but the given hash did not match. |
+| `-1` | Application did not run successfully. No hash was compared. |
+
 In the case of a `-1` status code, check the console for any error messages.
