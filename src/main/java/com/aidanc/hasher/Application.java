@@ -30,20 +30,18 @@ public class Application {
 			return -1;
 		}
 
-		displayComplete(arguments, hashResult.getResultHash());
+		displayComplete(arguments, hashResult);
 
-		boolean match = arguments.getHash().equalsIgnoreCase(hashResult.getResultHash());
-
-		return match ? 0 : 1;
+		return hashResult.hashMatches(arguments.getHash()) ? 0 : 1;
 	}
 
-	public void displayComplete(final Args arguments, final String fileHash) {
+	public void displayComplete(final Args arguments, final HashResult hashResult) {
 		print("Complete.");
 		print(String.format(formatStr, "Hashed:", arguments.getFile().getName()));
 		print(String.format(formatStr, "Provided: ", arguments.getHash()));
-		print(String.format(formatStr, "File Hash:", fileHash.toUpperCase()));
+		print(String.format(formatStr, "File Hash:", hashResult.getResultHash().toUpperCase()));
 		print(String.format(formatStr, "Comparison: ",
-				(arguments.getHash().equalsIgnoreCase(fileHash) ? "EQUAL" : "NOT EQUAL")));
+				(hashResult.hashMatches(arguments.getHash()) ? "EQUAL" : "NOT EQUAL")));
 	}
 
 	public void print(final String string, boolean error) {
