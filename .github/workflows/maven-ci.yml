@@ -40,7 +40,7 @@ jobs:
     name: coverage
     steps:
       - name: Publish coverge
-        uses: paambaati/codeclimate-action@2.7.5
+        uses: paambaati/codeclimate-action@v2.7.5
         env: 
           CC_TEST_REPORTER_ID: ${{secrets.CC_TEST_REPORTER_ID}}
           JACOCO_SOURCE_PATH: "${{github.workspace}}/src/main/java"
