@@ -2,6 +2,7 @@ package com.aidanc.hasher;
 
 import com.aidanc.hasher.arguments.Args;
 import com.beust.jcommander.JCommander;
+import com.beust.jcommander.ParameterException;
 
 public class Application {
 
@@ -20,7 +21,19 @@ public class Application {
 	}
 
 	public int run(String[] args) {
-		JCommander.newBuilder().addObject(arguments).build().parse(args);
+		JCommander launchArgs = JCommander.newBuilder().addObject(arguments).build();
+		launchArgs.setProgramName("hasher");
+		try {
+			launchArgs.parse(args);
+			if (arguments.isHelp()) {
+				launchArgs.usage();
+				return 0;
+			}
+		} catch (ParameterException ex) {
+			System.out.println(ex.getMessage());
+			ex.getJCommander().usage();
+			return 1;
+		}
 
 		print("Hashing using algorithm: \"" + arguments.getAlgorithm() + "\"...");
 		final HashResult hashResult = hasher.hash(arguments.getFile(), arguments.getAlgorithm());

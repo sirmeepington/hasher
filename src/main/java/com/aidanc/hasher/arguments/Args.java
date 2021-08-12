@@ -16,16 +16,19 @@ public class Args {
 	 * Input file, uses custom converter {@link FileConverter}. Required.
 	 */
 	@Parameter(names = { "-f",
-			"-file" }, description = "File location", required = true, converter = FileConverter.class)
+			"-file" }, description = "Location of the file to hash.", required = true, converter = FileConverter.class)
 	private File file;
 
-	@Parameter(names = { "-s", "-silent" }, description = "Silences all messags. Result is the exit code.")
+	@Parameter(names = { "-s", "-silent" }, description = "Silences all messages. Result is the exit code.")
 	private boolean silent = false;
+
+	@Parameter(names = { "-help", "--help" }, help = true, description = "Shows the available parameters.")
+	private boolean help;
 
 	/**
 	 * Hashing algorithm to use. Defaults to <code>SHA-256</code>
 	 */
-	@Parameter(names = { "-a", "-algorithm", "-algo" }, description = "Hashing algorithm")
+	@Parameter(names = { "-a", "-algorithm", "-algo" }, description = "Hashing algorithm to use")
 	private String algorithm = "SHA-256";
 
 	/**
@@ -71,6 +74,15 @@ public class Args {
 	 */
 	public String getHash() {
 		return hash;
+	}
+
+	/**
+	 * Has the help flag been passed to the application?
+	 * 
+	 * @return Whether or not the help flag has been passed.
+	 */
+	public boolean isHelp() {
+		return help;
 	}
 
 }
