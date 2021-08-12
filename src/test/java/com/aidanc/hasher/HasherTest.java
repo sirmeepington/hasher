@@ -7,9 +7,6 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.File;
-import java.io.IOException;
-import java.io.RandomAccessFile;
-import java.nio.channels.FileLock;
 
 import org.junit.jupiter.api.Test;
 
@@ -59,19 +56,6 @@ public class HasherTest {
 		assertNull(outHash.getResultHash());
 		assertEquals(outHash.getFailedReason(), FailReason.INVALID_ALGORITHM);
 		assertFalse(outHash.isHashedSuccessfully());
-	}
-
-	@Test()
-	public void testhash_ValidAlgorithm_ValidFile_ForcedIOException() throws IOException {
-		try (final RandomAccessFile fileAccess = new RandomAccessFile(filename, "rw")) {
-			try (FileLock lock = fileAccess.getChannel().lock()) {
-				Hasher hasher = new Hasher();
-				HashResult out = hasher.hash(new File(filename), "SHA-256");
-				assertNull(out.getResultHash());
-				assertEquals(out.getFailedReason(), FailReason.IO_FAILURE);
-				assertFalse(out.isHashedSuccessfully());
-			}
-		}
 	}
 
 }
