@@ -23,16 +23,16 @@ public class Application {
 		JCommander.newBuilder().addObject(arguments).build().parse(args);
 
 		print("Hashing using algorithm: \"" + arguments.getAlgorithm() + "\"...");
-		String fileHash = hasher.hash(arguments.getFile(), arguments.getAlgorithm());
+		HashResult hashResult = hasher.hash(arguments.getFile(), arguments.getAlgorithm());
 
-		if (fileHash == null || fileHash.isEmpty()) {
+		if (!hashResult.isHashedSuccessfully()) {
 			print("Failed to hash. See previous message(s).", true);
-			return 1;
+			return -1;
 		}
 
-		displayComplete(arguments, fileHash);
+		displayComplete(arguments, hashResult.getResultHash());
 
-		boolean match = arguments.getHash().equalsIgnoreCase(fileHash);
+		boolean match = arguments.getHash().equalsIgnoreCase(hashResult.getResultHash());
 
 		return match ? 0 : 1;
 	}

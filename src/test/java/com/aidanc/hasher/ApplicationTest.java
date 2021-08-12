@@ -31,11 +31,11 @@ class ApplicationTest {
 	}
 
 	@Test
-	void testMain_SystemExit_CodeOne() throws Exception {
+	void testMain_SystemExit_FailedToHash() throws Exception {
 		int status = SystemLambda.catchSystemExit(() -> {
 			Application.main(new String[] { "-f", "123", "-h", "123" });
 		});
-		assertEquals(status, 1);
+		assertEquals(status, -1);
 	}
 
 	@Test

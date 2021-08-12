@@ -1,7 +1,10 @@
 package com.aidanc.hasher;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.File;
 import java.io.IOException;
@@ -13,37 +16,38 @@ import org.junit.jupiter.api.Test;
 public class HasherTest {
 
 	final String filename = "src/test/resources/test file.txt";
+	final String validHash = "315F5BDB76D078C43B8AC0064E4A0164612B1FCE77C869345BFC94C75894EDD3";
+	final String algorithm = "SHA-256";
 
 	@Test
 	public void testHash_ValidAlgorithm_NullFile() {
-
-		final String algorithm = "SHA-256";
 		final File file = null;
 
-		String outHash = new Hasher().hash(file, algorithm);
+		HashResult outHash = new Hasher().hash(file, algorithm);
 
-		assertNull(outHash);
+		assertNull(outHash.getResultHash());
+		assertFalse(outHash.isHashedSuccessfully());
 	}
 
 	@Test
 	public void testhash_ValidAlgorithm_ValidFile() {
-		final String algorithm = "SHA-256";
-
 		final File file = new File(filename);
 
-		String outHash = new Hasher().hash(file, algorithm);
+		HashResult outHash = new Hasher().hash(file, algorithm);
 
-		assertNotNull(outHash);
+		assertNotNull(outHash.getResultHash());
+		assertTrue(outHash.isHashedSuccessfully());
+		assertTrue(outHash.hashMatches(validHash));
 	}
 
 	@Test
 	public void testhash_ValidAlgorithm_Directory() {
-		final String algorithm = "SHA-256";
 		final File file = new File("src/test/resources/");
 
-		String outHash = new Hasher().hash(file, algorithm);
-
-		assertNull(outHash);
+		HashResult outHash = new Hasher().hash(file, algorithm);
+		assertNull(outHash.getResultHash());
+		assertFalse(outHash.isHashedSuccessfully());
+		assertEquals(outHash.getFailedReason(), FailReason.INVALID_FILE);
 	}
 
 	@Test
@@ -51,8 +55,10 @@ public class HasherTest {
 		final String algorithm = "not a valid algorithm";
 		final File file = new File(filename);
 
-		String outHash = new Hasher().hash(file, algorithm);
-		assertNull(outHash);
+		HashResult outHash = new Hasher().hash(file, algorithm);
+		assertNull(outHash.getResultHash());
+		assertEquals(outHash.getFailedReason(), FailReason.INVALID_ALGORITHM);
+		assertFalse(outHash.isHashedSuccessfully());
 	}
 
 	@Test()
@@ -60,8 +66,10 @@ public class HasherTest {
 		try (final RandomAccessFile fileAccess = new RandomAccessFile(filename, "rw")) {
 			try (FileLock lock = fileAccess.getChannel().lock()) {
 				Hasher hasher = new Hasher();
-				String out = hasher.hash(new File(filename), "SHA-256");
-				assertNull(out);
+				HashResult out = hasher.hash(new File(filename), "SHA-256");
+				assertNull(out.getResultHash());
+				assertEquals(out.getFailedReason(), FailReason.IO_FAILURE);
+				assertFalse(out.isHashedSuccessfully());
 			}
 		}
 	}
