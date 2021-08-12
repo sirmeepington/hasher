@@ -5,8 +5,8 @@ import com.beust.jcommander.JCommander;
 
 public class Application {
 
-	private Args arguments;
-	private Hasher hasher;
+	private final Args arguments;
+	private final Hasher hasher;
 	private final String formatStr = "%-15s %s";
 
 	public static void main(String[] args) {
@@ -23,30 +23,28 @@ public class Application {
 		JCommander.newBuilder().addObject(arguments).build().parse(args);
 
 		print("Hashing using algorithm: \"" + arguments.getAlgorithm() + "\"...");
-		String fileHash = hasher.hash(arguments.getFile(), arguments.getAlgorithm());
+		final HashResult hashResult = hasher.hash(arguments.getFile(), arguments.getAlgorithm());
 
-		if (fileHash == null || fileHash.isEmpty()) {
+		if (!hashResult.isHashedSuccessfully()) {
 			print("Failed to hash. See previous message(s).", true);
-			return 1;
+			return -1;
 		}
 
-		displayComplete(arguments, fileHash);
+		displayComplete(arguments, hashResult);
 
-		boolean match = arguments.getHash().equalsIgnoreCase(fileHash);
-
-		return match ? 0 : 1;
+		return hashResult.hashMatches(arguments.getHash()) ? 0 : 1;
 	}
 
-	public void displayComplete(final Args arguments, final String fileHash) {
+	public void displayComplete(final Args arguments, final HashResult hashResult) {
 		print("Complete.");
 		print(String.format(formatStr, "Hashed:", arguments.getFile().getName()));
 		print(String.format(formatStr, "Provided: ", arguments.getHash()));
-		print(String.format(formatStr, "File Hash:", fileHash.toUpperCase()));
+		print(String.format(formatStr, "File Hash:", hashResult.getResultHash().toUpperCase()));
 		print(String.format(formatStr, "Comparison: ",
-				(arguments.getHash().equalsIgnoreCase(fileHash) ? "EQUAL" : "NOT EQUAL")));
+				(hashResult.hashMatches(arguments.getHash()) ? "EQUAL" : "NOT EQUAL")));
 	}
 
-	public void print(String string, boolean error) {
+	public void print(final String string, boolean error) {
 		if (arguments.isSilent())
 			return;
 
@@ -57,7 +55,7 @@ public class Application {
 		}
 	}
 
-	public void print(String string) {
+	public void print(final String string) {
 		print(string, false);
 	}
 }

@@ -2,6 +2,7 @@ package com.aidanc.hasher;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -24,17 +25,25 @@ public class Hasher {
 	 * @return A <code>String</code> of the file's hash if the hashing succeeds,
 	 *         otherwise <code>null</code>
 	 */
-	public String hash(final File file, final String hashAlgo) {
+	public HashResult hash(final File file, final String hashAlgo) {
+		String resultHash = null;
+		FailReason fail = FailReason.NONE;
+
 		try {
 			MessageDigest digest = MessageDigest.getInstance(hashAlgo);
-			return consume(digest, file);
+			resultHash = consume(digest, file);
 		} catch (NoSuchAlgorithmException e) {
 			System.err.println("Unknown hashing algorithm: " + hashAlgo);
-			return null;
+			fail = FailReason.INVALID_ALGORITHM;
+		} catch (FileNotFoundException fileEx) {
+			System.err.println("File does not exist.");
+			fail = FailReason.INVALID_FILE;
 		} catch (IOException ex) {
 			System.err.println("IOException caught when hashing file.");
-			return null;
+			fail = FailReason.IO_FAILURE;
 		}
+
+		return new HashResult(resultHash, fail == FailReason.NONE, fail);
 	}
 
 	/**
@@ -54,9 +63,9 @@ public class Hasher {
 	 * @throws IOException If the file cannot be read from a {@link FileInputStream}
 	 *                     this is thrown, and no result or hashing occurs.
 	 */
-	public String consume(final MessageDigest digest, final File file) throws IOException {
+	public String consume(final MessageDigest digest, final File file) throws FileNotFoundException, IOException {
 		if (file == null || !file.isFile())
-			return null;
+			throw new FileNotFoundException();
 		try (FileInputStream stream = new FileInputStream(file)) {
 			final byte[] bytes = new byte[1024];
 			int count = 0;
