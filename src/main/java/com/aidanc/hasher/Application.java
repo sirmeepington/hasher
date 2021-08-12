@@ -1,7 +1,17 @@
 package com.aidanc.hasher;
 
+import java.security.MessageDigest;
+import java.security.Provider;
+import java.security.Provider.Service;
+import java.security.Security;
+import java.util.HashSet;
+import java.util.Set;
+
+import org.bouncycastle.jce.provider.BouncyCastleProvider;
+
 import com.aidanc.hasher.arguments.Args;
 import com.beust.jcommander.JCommander;
+import com.beust.jcommander.ParameterException;
 
 public class Application {
 
@@ -17,10 +27,29 @@ public class Application {
 	public Application() {
 		arguments = new Args();
 		hasher = new Hasher();
+		Security.addProvider(new BouncyCastleProvider());
 	}
 
 	public int run(String[] args) {
-		JCommander.newBuilder().addObject(arguments).build().parse(args);
+		JCommander launchArgs = JCommander.newBuilder().addObject(arguments).build();
+		launchArgs.setProgramName("hasher");
+		try {
+			launchArgs.parse(args);
+			if (arguments.isHelp()) {
+				launchArgs.usage();
+				return 0;
+			}
+			if (arguments.shouldListAlgorithms()) {
+				if (arguments.isSilent())
+					return 0;
+				listAlgorithms();
+				return 0;
+			}
+		} catch (ParameterException ex) {
+			System.out.println(ex.getMessage());
+			ex.getJCommander().usage();
+			return 1;
+		}
 
 		print("Hashing using algorithm: \"" + arguments.getAlgorithm() + "\"...");
 		final HashResult hashResult = hasher.hash(arguments.getFile(), arguments.getAlgorithm());
@@ -33,6 +62,44 @@ public class Application {
 		displayComplete(arguments, hashResult);
 
 		return hashResult.hashMatches(arguments.getHash()) ? 0 : 1;
+	}
+
+	private void listAlgorithms() {
+		final StringBuilder sb = new StringBuilder();
+		sb.append("Currently available hashing algorithms:\n");
+		final Set<String> algos = gatherAlgorithms();
+		for (String s : algos) {
+			if (s.contains(".")) {
+				continue; // The ones with dots in are OID format.
+			}
+			sb.append(s);
+			sb.append("\n");
+		}
+		System.out.println(sb.toString());
+	}
+
+	// Not gonna lie, gotta thank StackOverflow for this one, holy shit.
+	// https://stackoverflow.com/a/24983009
+	private Set<String> gatherAlgorithms() {
+		Set<String> algos = new HashSet<String>();
+		final Provider[] providers = Security.getProviders();
+		for (Provider prov : providers) {
+			Set<Service> services = prov.getServices();
+			for (Service svc : services) {
+				if (svc.getType().equals(MessageDigest.class.getSimpleName())) {
+					algos.add(svc.getAlgorithm());
+				}
+			}
+			final Set<Object> keys = prov.keySet();
+			for (Object key : keys) {
+				final String prefix = "Alg.Alias." + MessageDigest.class.getSimpleName() + ".";
+				if (key.toString().startsWith(prefix)) {
+					String value = prov.get(key.toString()).toString();
+					algos.add(value);
+				}
+			}
+		}
+		return algos;
 	}
 
 	public void displayComplete(final Args arguments, final HashResult hashResult) {
