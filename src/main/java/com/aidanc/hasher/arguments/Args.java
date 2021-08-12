@@ -16,10 +16,10 @@ public class Args {
 	 * Input file, uses custom converter {@link FileConverter}. Required.
 	 */
 	@Parameter(names = { "-f",
-			"-file" }, description = "Location of the file to hash.", required = true, converter = FileConverter.class)
+			"--file" }, description = "Location of the file to hash.", required = true, converter = FileConverter.class)
 	private File file;
 
-	@Parameter(names = { "-s", "-silent" }, description = "Silences all messages. Result is the exit code.")
+	@Parameter(names = { "-s", "--silent" }, description = "Silences all messages. Result is the exit code.")
 	private boolean silent = false;
 
 	@Parameter(names = { "-help", "--help" }, help = true, description = "Shows the available parameters.")
@@ -28,14 +28,18 @@ public class Args {
 	/**
 	 * Hashing algorithm to use. Defaults to <code>SHA-256</code>
 	 */
-	@Parameter(names = { "-a", "-algorithm", "-algo" }, description = "Hashing algorithm to use")
+	@Parameter(names = { "-a", "--algorithm", "-algo" }, description = "Hashing algorithm to use")
 	private String algorithm = "SHA-256";
 
 	/**
 	 * Input hash to compare result against. Required.
 	 */
-	@Parameter(names = { "-h", "-hash" }, description = "Hash to compare against", required = true)
+	@Parameter(names = { "-h", "--hash" }, description = "Hash to compare against", required = true)
 	private String hash;
+
+	@Parameter(names = { "-la",
+			"--list-algorithms" }, description = "Lists all the hashing algorithms available.", help = true)
+	private boolean listAlgorithms;
 
 	/**
 	 * The input file. Gathered from a file location via {@link #file} Jcommander
@@ -83,6 +87,16 @@ public class Args {
 	 */
 	public boolean isHelp() {
 		return help;
+	}
+
+	/**
+	 * Returns whether or not normal functionality should be disabled and that the
+	 * program should list off the available hashing algorithms.
+	 * 
+	 * @return Whether to list the algorithms or proceed normally.
+	 */
+	public boolean shouldListAlgorithms() {
+		return listAlgorithms;
 	}
 
 }
