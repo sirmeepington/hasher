@@ -12,7 +12,7 @@
 |------|-------------|----------|----------|--------|
 | `-f` | File to hash and compare | Yes | Yes | N/A |
 | `-s` | Whether to silence all `System.out` output | No | No | False |
-| `-h` | The has to compare the file hash against. | Yes | Yes | N/A |
+| `-h` | The hash to compare the file hash against. | Yes | Yes | N/A |
 | `-a` | The hashing algorithm to use when hashing the file. | No | Yes | SHA-256 |
 
 Supports all the hashing algorihms supported by Java's [MessageDigest](https://docs.oracle.com/en/java/javase/16/docs/api/java.base/java/security/MessageDigest.html) object.
