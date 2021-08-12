@@ -39,6 +39,7 @@ jobs:
     needs: [ build ]
     name: coverage
     steps:
+      - uses: actions/checkout@v2
       - name: Publish coverge
         uses: paambaati/codeclimate-action@v2.7.5
         env: 
