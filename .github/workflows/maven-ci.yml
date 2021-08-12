@@ -31,20 +31,12 @@ jobs:
     - name: Compile with Maven
       run: mvn compile
       
-    
-
-  test:
-    name: test
-    runs-on: ubuntu-latest
-    needs: [ build ]
-    steps:
-      - uses: actions/checkout@v2
-      - name: Run Maven tests
+    - name: Run Maven tests
         run: mvn test
         
   coverage:
     runs-on: ubuntu-latest
-    needs: [ test ]
+    needs: [ build ]
     name: coverage
     steps:
       - name: Publish coverge
