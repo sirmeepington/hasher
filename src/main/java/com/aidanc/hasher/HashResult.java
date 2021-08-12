@@ -39,7 +39,7 @@ public class HashResult {
 	 * @return A boolean showing whether or not the given hash matches the resulting
 	 *         hash.
 	 */
-	public boolean hashMatches(String ourHash) {
+	public boolean hashMatches(final String ourHash) {
 		if (!isHashedSuccessfully())
 			return false;
 

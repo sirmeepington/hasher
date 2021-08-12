@@ -5,8 +5,8 @@ import com.beust.jcommander.JCommander;
 
 public class Application {
 
-	private Args arguments;
-	private Hasher hasher;
+	private final Args arguments;
+	private final Hasher hasher;
 	private final String formatStr = "%-15s %s";
 
 	public static void main(String[] args) {
@@ -23,7 +23,7 @@ public class Application {
 		JCommander.newBuilder().addObject(arguments).build().parse(args);
 
 		print("Hashing using algorithm: \"" + arguments.getAlgorithm() + "\"...");
-		HashResult hashResult = hasher.hash(arguments.getFile(), arguments.getAlgorithm());
+		final HashResult hashResult = hasher.hash(arguments.getFile(), arguments.getAlgorithm());
 
 		if (!hashResult.isHashedSuccessfully()) {
 			print("Failed to hash. See previous message(s).", true);
@@ -46,7 +46,7 @@ public class Application {
 				(arguments.getHash().equalsIgnoreCase(fileHash) ? "EQUAL" : "NOT EQUAL")));
 	}
 
-	public void print(String string, boolean error) {
+	public void print(final String string, boolean error) {
 		if (arguments.isSilent())
 			return;
 
@@ -57,7 +57,7 @@ public class Application {
 		}
 	}
 
-	public void print(String string) {
+	public void print(final String string) {
 		print(string, false);
 	}
 }
